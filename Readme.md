@@ -1,40 +1,10 @@
 ```bash
-+-----------------------------------------------+
-|                  React UI                      |
-|                                               |
-|  +-----------------------------------------+  |
-|  |             User Interface              |  |
-|  |  (Login, Dashboard, Profile, etc.)      |  |
-|  +-----------------------------------------+  |
-|                |                      |        |
-+----------------|----------------------|--------+
-                 |                      |
-                 |                      |
-+----------------v----------------------+        +----------------------+
-|           React App                   |        |        FastAPI       |
-|                                       |        |                      |
-|  +---------------------------------+  |        |  +----------------+  |
-|  |    React Components            |  |  HTTP  |  |   Authentication |  |
-|  |    (Login, Dashboard, etc.)    |  | <----> |  |   & Authorization |  |
-|  +---------------------------------+  |        |  |       Logic      |  |
-|  |         API Requests           |  |        |  +------------------+  |
-|  |        (Axios, Fetch, etc.)    |  |        |        |               |
-|  +---------------------------------+  |        |        v               |
-+----------------|----------------------+        |   +------------+     |
-                 |                                |   | MongoDB    |     |
-+----------------v----------------------+        |   | Database   |     |
-|          Backend Server             |        |   +------------+     |
-|  (FastAPI Application)              |        +----------------------+
-|                                     |
-|  +-------------------------+        |
-|  | FastAPI Dependency      |        |
-|  | (PyJWT for JWT, MongoDB  |        |
-|  | driver for database)     |        |
-|  +-------------------------+        |
-+---------------------------------------+
+# Update System Packages
+sudo apt update && sudo apt upgrade -y
 
-```
+# Install Docker
+sudo apt install docker.io -y
 
--Normal Text
+#Install Docker Compose
+sudo apt install docker-compose -y
 
-## 1. Low Level Design 
