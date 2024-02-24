@@ -7,7 +7,7 @@ class User(BaseModel):
     username: str
     email: EmailStr
     password: str
-    role : str = "staff"
+    role : str = "user"
 
     class Config:
         orm_mode = True
