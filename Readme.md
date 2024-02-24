@@ -1,4 +1,4 @@
-# Installtion & Creation of CI-CD Pipeline
+# Installtion, Deployment of FastAPI with Swagger UI on VPS & Creation of CI-CD Pipeline with GitHub WorkFlows.
 
 ## Installtions of Packages 
 ```bash
