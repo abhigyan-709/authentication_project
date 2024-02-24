@@ -2,7 +2,6 @@
 
 from fastapi import FastAPI, Depends
 # from routes.item import route as item_router  # Correct import
-from database.db import db
 from routes.user import route2, get_current_user  # Import the dependency
 
 
