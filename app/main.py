@@ -10,9 +10,9 @@ app = FastAPI(title="Authentication & User Management API",
               description="All in ONE User Management API for your Desired Need",
               version="1.1.0",
               servers=[
-        {"url": "https://auth.globaltamasha.in", "description": "Staging environment"},
-        {"url": "https://auth.globaltamasha.com", "description": "Production environment"},
-    ],
+    #     {"url": "https://auth.globaltamasha.in", "description": "Staging environment"},
+    #     {"url": "https://auth.globaltamasha.com", "description": "Production environment"},
+    # ],
     docs_url="/docs",
     contact={
         "name": "Developed by Abhigyan Kumar",
@@ -29,3 +29,4 @@ app.include_router(route2)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+
