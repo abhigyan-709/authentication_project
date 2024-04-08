@@ -9,10 +9,6 @@ from routes.user import route2, get_current_user  # Import the dependency
 app = FastAPI(title="Authentication & User Management API",
               description="All in ONE User Management API for your Desired Need",
               version="1.1.0",
-              servers=[
-    #     {"url": "https://auth.globaltamasha.in", "description": "Staging environment"},
-    #     {"url": "https://auth.globaltamasha.com", "description": "Production environment"},
-    # ],
     docs_url="/docs",
     contact={
         "name": "Developed by Abhigyan Kumar",
