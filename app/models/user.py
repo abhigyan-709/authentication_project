@@ -1,3 +1,6 @@
+# models/user.py
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 class User(BaseModel):
@@ -7,7 +10,8 @@ class User(BaseModel):
     username: str
     email: EmailStr
     password: str
-    role : str = "user"
+    role : str = "user" # default user is set to the user role
+    is_active : bool = False
 
     class Config:
         orm_mode = True
