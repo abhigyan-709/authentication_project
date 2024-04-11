@@ -4,14 +4,13 @@ from fastapi import FastAPI, Depends
 # from routes.item import route as item_router  # Correct import
 from database.db import db
 from routes.user import route2
-from routes.category import industrial_route
-from routes.user_response import user_response_route
+# from routes.user_response import user_response_route 
 from routes.user import route2, get_current_user  # Import the dependency
 
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Industrial Carbon Emission Calculator API",
-              description="All in ONE advanced Calculator with User Management.",
+app = FastAPI(title="OpenSource Enterprise Authentication API",
+              description="All in ONE advanced Authentication API with User Management.",
               version="1.1.0",
     #           servers=[
     #     {"url": "https://auth.globaltamasha.in", "description": "Staging environment"},
@@ -38,17 +37,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-
-
-app.include_router(
-    industrial_route,
-    dependencies=[Depends(get_current_user)],  # Add the dependency here
-)
-app.include_router(
-    user_response_route,
-    dependencies=[Depends(get_current_user)],  # Add the dependency here
 )
 
 
