@@ -1,5 +1,5 @@
-resource "aws_ecr_repository" "my_repo" {
-  name                 = "my-python-app-repo"
+resource "aws_ecr_repository" "auth_repo" {
+  name                 = "auth_app_repo"
   image_scanning_configuration {
     scan_on_push = true
   }
