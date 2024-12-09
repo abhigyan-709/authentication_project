@@ -64,6 +64,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except jwt.PyJWTError:
         raise credentials_exception
 
+@route2.get("/")
+async def root():
+    # Test MongoDB connection
+    client = db.get_client()
+    return {"message": "Connected to MongoDB successfully!"}
 
 @route2.post("/token", response_model=Token, tags=["Login & Authentication"])
 async def login_for_access_token(
