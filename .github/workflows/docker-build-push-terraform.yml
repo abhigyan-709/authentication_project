@@ -1,0 +1,66 @@
+name: Docker Build, Push to AWS ECR & Terraform Setup
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up AWS credentials to access ECR and Terraform
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.4.6  # Use your desired Terraform version
+
+      # Initialize Terraform (infrastructure/ecr.tf)
+      - name: Terraform Init
+        run: |
+          cd infrastructure
+          terraform init
+
+      # Apply Terraform configuration (infrastructure/ecr.tf)
+      - name: Terraform Apply
+        run: |
+          cd infrastructure
+          terraform apply -auto-approve
+
+      # Log in to AWS ECR
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 861276099115.dkr.ecr.ap-south-1.amazonaws.com
+
+      # Build FastAPI Docker image and tag it with "latest"
+      - name: Build Docker image
+        run: |
+          docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest .
+
+      # Push the image to AWS ECR
+      - name: Push Docker image to AWS ECR
+        run: |
+          docker push 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest
+
+      # MongoDB shell connection check (Optional, but can verify if MongoDB is accessible)
+      - name: Check MongoDB shell connection
+        run: |
+          docker run --rm mongo:5.0 mongo --host <EC2_IP_ADDRESS> --eval "db.runCommand({ connectionStatus: 1 })"
+
+      # Run Docker Compose locally (You will have to ensure that Docker Compose is installed on the GitHub runner if testing this locally)
+      - name: Run Docker Compose Locally
+        run: |
+          docker-compose -f docker-compose.yaml up -d
