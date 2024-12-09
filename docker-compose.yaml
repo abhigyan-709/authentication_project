@@ -2,8 +2,7 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: ./app
+    image: 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest
     ports:
       - "8000:8000"  # Expose FastAPI app on port 8000
     env_file:
