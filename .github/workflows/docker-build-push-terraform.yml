@@ -42,11 +42,12 @@ jobs:
           cd infrastructure
           terraform init
 
-      # Apply Terraform configuration (infrastructure/ecr.tf)
-      - name: Terraform Apply
+      # Check if the resources already exist and apply changes if necessary
+      - name: Terraform Plan and Apply
         run: |
           cd infrastructure
-          terraform apply -auto-approve
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
 
       # Log in to AWS ECR
       - name: Log in to Amazon ECR
