@@ -3,7 +3,7 @@ name: Docker Build, Push to AWS ECR & Terraform Setup
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up AWS credentials
+      # Set up AWS credentials to access ECR and Terraform
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -29,56 +29,39 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
-
       # Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.4.6
+          terraform_version: 1.4.6  # Use your desired Terraform version
 
-      # Initialize Terraform
+      # Initialize Terraform (infrastructure/ecr.tf)
       - name: Terraform Init
         run: |
-          cd infrastructure
+          cd infrasctructure
           terraform init
-
-      # Import existing ECR repository and IAM resources
-      - name: Import existing resources
+      # Apply Terraform configuration (infrastructure/ecr.tf)
+      - name: Terraform Apply
         run: |
-          cd infrastructure
-          terraform import aws_ecr_repository.auth_repo auth_app_repo || echo "Repository already imported"
-          terraform import aws_iam_policy.existing_policy arn:aws:iam::861276099115:policy/ECRAccessPolicy || echo "Policy already imported"
-          terraform import aws_iam_user.ecr_user ecr_user || echo "User already imported"
-          terraform import aws_iam_role.ecr_role ECRRole || echo "Role already imported"
-
-      # Terraform Plan and Apply
-      - name: Terraform Plan and Apply
-        run: |
-          cd infrastructure
-          terraform plan -out=tfplan
-          terraform apply -auto-approve tfplan
-
+          cd infrasctructure
+          terraform apply -auto-approve
       # Log in to AWS ECR
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 861276099115.dkr.ecr.ap-south-1.amazonaws.com
-
-      # Build Docker image and tag it
+      # Build FastAPI Docker image and tag it with "latest"
       - name: Build Docker image
         run: |
           docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest -f app/Dockerfile .
-
-      # Push Docker image to AWS ECR
+      # Push the image to AWS ECR
       - name: Push Docker image to AWS ECR
         run: |
           docker push 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest
-
-      # MongoDB shell connection check
+      # MongoDB shell connection check (Optional, but can verify if MongoDB is accessible)
       - name: Check MongoDB shell connection
         run: |
           docker run --rm mongo:5.0 mongo --host 43.204.143.5 --eval "db.runCommand({ connectionStatus: 1 })"
-
-      # Run Docker Compose locally
+      # Run Docker Compose locally (You will have to ensure that Docker Compose is installed on the GitHub runner if testing this locally)
       - name: Run Docker Compose Locally
         run: |
           docker-compose -f docker-compose.yaml up -d
