@@ -77,7 +77,7 @@ resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
 # S3 Bucket for Terraform State
 resource "aws_s3_bucket" "terraform_state_bucket" {
   bucket = "terraform-state-bucket"  # Use a globally unique name for your bucket
-  region = "ap-south-1"  # Change to your desired region
+  region = "'us-east-1"  # Change to your desired region
 
   versioning {
     enabled = true
