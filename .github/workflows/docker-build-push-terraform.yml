@@ -29,6 +29,7 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
+
       # Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
@@ -39,28 +40,38 @@ jobs:
       - name: Terraform Init
         run: |
           cd infrastructure
-          terraform init
+          terraform init -backend-config="bucket=terraform-state-bucket" \
+                          -backend-config="key=terraform/state/terraform.tfstate" \
+                          -backend-config="region=ap-south-1" \
+                          -backend-config="dynamodb_table=terraform-lock-table" \
+                          -backend-config="encrypt=true"
+
       # Apply Terraform configuration (infrastructure/ecr.tf)
       - name: Terraform Apply
         run: |
           cd infrastructure
           terraform apply -auto-approve
+
       # Log in to AWS ECR
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 861276099115.dkr.ecr.ap-south-1.amazonaws.com
+
       # Build FastAPI Docker image and tag it with "latest"
       - name: Build Docker image
         run: |
           docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest -f app/Dockerfile .
+
       # Push the image to AWS ECR
       - name: Push Docker image to AWS ECR
         run: |
           docker push 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest
+
       # MongoDB shell connection check (Optional, but can verify if MongoDB is accessible)
       - name: Check MongoDB shell connection
         run: |
           docker run --rm mongo:5.0 mongo --host 43.204.143.5 --eval "db.runCommand({ connectionStatus: 1 })"
+
       # Run Docker Compose locally (You will have to ensure that Docker Compose is installed on the GitHub runner if testing this locally)
       - name: Run Docker Compose Locally
         run: |

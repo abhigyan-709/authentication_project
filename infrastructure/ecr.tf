@@ -73,3 +73,21 @@ resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
   role       = aws_iam_role.ecr_role.name
   policy_arn = aws_iam_policy.ecr_policy.arn
 }
+
+# S3 Bucket for Terraform State
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "terraform-state-bucket"  # Replace with your bucket name
+  acl    = "private"
+}
+
+# DynamoDB Table for Terraform State Locking
+resource "aws_dynamodb_table" "terraform_lock" {
+  name         = "terraform-lock-table"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
