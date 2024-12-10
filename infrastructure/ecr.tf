@@ -12,6 +12,11 @@ resource "aws_ecr_repository" "auth_repo" {
   }
 
   image_tag_mutability = "MUTABLE"
+
+  lifecycle {
+    # Prevent Terraform from trying to delete or recreate the repository
+    prevent_destroy = true
+  }
 }
 
 # Output the Repository URL
@@ -37,20 +42,35 @@ resource "aws_iam_policy" "ecr_policy" {
       }
     ]
   })
+
+  lifecycle {
+    # Prevent Terraform from deleting the IAM policy
+    prevent_destroy = true
+  }
 }
 
 # IAM User
 resource "aws_iam_user" "ecr_user" {
   name = "ecr_user"
+
+  lifecycle {
+    # Prevent Terraform from deleting the IAM user
+    prevent_destroy = true
+  }
 }
 
 # Attach the Policy to the IAM User
 resource "aws_iam_user_policy_attachment" "ecr_policy_attachment" {
   user       = aws_iam_user.ecr_user.name
   policy_arn = aws_iam_policy.ecr_policy.arn
+
+  lifecycle {
+    # Prevent Terraform from trying to remove this attachment
+    prevent_destroy = true
+  }
 }
 
-# (Optional) IAM Role for Role Assumption
+# IAM Role for Role Assumption
 resource "aws_iam_role" "ecr_role" {
   name = "ECRRole"
 
@@ -66,10 +86,20 @@ resource "aws_iam_role" "ecr_role" {
       }
     ]
   })
+
+  lifecycle {
+    # Prevent Terraform from deleting the IAM role
+    prevent_destroy = true
+  }
 }
 
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
   role       = aws_iam_role.ecr_role.name
   policy_arn = aws_iam_policy.ecr_policy.arn
+
+  lifecycle {
+    # Prevent Terraform from trying to remove this attachment
+    prevent_destroy = true
+  }
 }
