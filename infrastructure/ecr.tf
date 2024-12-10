@@ -75,17 +75,29 @@ resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
 }
 
 # S3 Bucket for Terraform State
-resource "aws_s3_bucket" "terraform_state" {
-  bucket = "terraform-state-bucket"  # Replace with your bucket name
-  acl    = "private"
+resource "aws_s3_bucket" "terraform_state_bucket" {
+  bucket = "terraform-state-bucket"  # Use a globally unique name for your bucket
+  region = "ap-south-1"  # Change to your desired region
+
+  versioning {
+    enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
+
 # DynamoDB Table for Terraform State Locking
-resource "aws_dynamodb_table" "terraform_lock" {
-  name         = "terraform-lock-table"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-  
+resource "aws_dynamodb_table" "terraform_lock_table" {
+  name           = "terraform-lock-table"
+  hash_key       = "LockID"
+  billing_mode   = "PAY_PER_REQUEST"
   attribute {
     name = "LockID"
     type = "S"
