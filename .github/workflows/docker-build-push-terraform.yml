@@ -48,7 +48,7 @@ jobs:
       # Build FastAPI Docker image and tag it with "latest"
       - name: Build Docker image
         run: |
-          docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest .
+          docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest -f app/Dockerfile .
 
       # Push the image to AWS ECR
       - name: Push Docker image to AWS ECR
