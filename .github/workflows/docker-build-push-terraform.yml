@@ -39,13 +39,13 @@ jobs:
       # Initialize Terraform (infrastructure/ecr.tf)
       - name: Terraform Init
         run: |
-          cd infrasctructure
+          cd infrastructure
           terraform init
 
       # Apply Terraform configuration (infrastructure/ecr.tf)
       - name: Terraform Apply
         run: |
-          cd infrasctructure
+          cd infrastructure
           terraform apply -auto-approve
 
       # Log in to AWS ECR

@@ -1,7 +1,6 @@
 venv/
-.env
-infrasctructure/.terraform/
-infrasctructure/terraform.tfstate
-infrasctructure/terraform.tfstate.backup
+infrastructure/.terraform/
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.backup
 
 
