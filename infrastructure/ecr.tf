@@ -1,6 +1,6 @@
 # Provider Configuration
 provider "aws" {
-  region = "ap-south-1" # Change to your desired region
+  region = "ap-south-1"
 }
 
 # ECR Repository
@@ -14,7 +14,6 @@ resource "aws_ecr_repository" "auth_repo" {
   image_tag_mutability = "MUTABLE"
 
   lifecycle {
-    # Prevent Terraform from trying to delete or recreate the repository
     prevent_destroy = true
   }
 }
@@ -24,8 +23,14 @@ output "repository_url" {
   value = aws_ecr_repository.auth_repo.repository_url
 }
 
+# Data Block for Existing IAM Policy
+data "aws_iam_policy" "existing_policy" {
+  name = "ECRAccessPolicy"
+}
+
 # IAM Policy for ECR Access
 resource "aws_iam_policy" "ecr_policy" {
+  count       = length(data.aws_iam_policy.existing_policy.id) == 0 ? 1 : 0
   name        = "ECRAccessPolicy"
   description = "Policy to allow access to ECR resources"
   policy = jsonencode({
@@ -44,7 +49,6 @@ resource "aws_iam_policy" "ecr_policy" {
   })
 
   lifecycle {
-    # Prevent Terraform from deleting the IAM policy
     prevent_destroy = true
   }
 }
@@ -54,7 +58,6 @@ resource "aws_iam_user" "ecr_user" {
   name = "ecr_user"
 
   lifecycle {
-    # Prevent Terraform from deleting the IAM user
     prevent_destroy = true
   }
 }
@@ -62,10 +65,9 @@ resource "aws_iam_user" "ecr_user" {
 # Attach the Policy to the IAM User
 resource "aws_iam_user_policy_attachment" "ecr_policy_attachment" {
   user       = aws_iam_user.ecr_user.name
-  policy_arn = aws_iam_policy.ecr_policy.arn
+  policy_arn = coalesce(data.aws_iam_policy.existing_policy.arn, aws_iam_policy.ecr_policy[0].arn)
 
   lifecycle {
-    # Prevent Terraform from trying to remove this attachment
     prevent_destroy = true
   }
 }
@@ -80,7 +82,7 @@ resource "aws_iam_role" "ecr_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "ec2.amazonaws.com" # Update based on the service or user assuming the role
+          Service = "ec2.amazonaws.com"
         },
         Action = "sts:AssumeRole"
       }
@@ -88,7 +90,6 @@ resource "aws_iam_role" "ecr_role" {
   })
 
   lifecycle {
-    # Prevent Terraform from deleting the IAM role
     prevent_destroy = true
   }
 }
@@ -96,10 +97,9 @@ resource "aws_iam_role" "ecr_role" {
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
   role       = aws_iam_role.ecr_role.name
-  policy_arn = aws_iam_policy.ecr_policy.arn
+  policy_arn = coalesce(data.aws_iam_policy.existing_policy.arn, aws_iam_policy.ecr_policy[0].arn)
 
   lifecycle {
-    # Prevent Terraform from trying to remove this attachment
     prevent_destroy = true
   }
 }

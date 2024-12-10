@@ -3,7 +3,7 @@ name: Docker Build, Push to AWS ECR & Terraform Setup
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up AWS credentials to access ECR and Terraform
+      # Set up AWS credentials
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -34,24 +34,24 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.4.6  # Use your desired Terraform version
+          terraform_version: 1.4.6
 
-      # Initialize Terraform (infrastructure/ecr.tf)
+      # Initialize Terraform
       - name: Terraform Init
         run: |
           cd infrastructure
           terraform init
 
-      # Check if the resources already exist and import them if necessary
-      - name: Import existing ECR repository and IAM resources
+      # Import existing ECR repository and IAM resources
+      - name: Import existing resources
         run: |
           cd infrastructure
           terraform import aws_ecr_repository.auth_repo auth_app_repo || echo "Repository already imported"
-          terraform import aws_iam_policy.ecr_policy ECRAccessPolicy || echo "Policy already imported"
+          terraform import aws_iam_policy.ecr_policy arn:aws:iam::<AWS_ACCOUNT_ID>:policy/ECRAccessPolicy || echo "Policy already imported"
           terraform import aws_iam_user.ecr_user ecr_user || echo "User already imported"
           terraform import aws_iam_role.ecr_role ECRRole || echo "Role already imported"
 
-      # Terraform Plan and Apply (check and apply only necessary changes)
+      # Terraform Plan and Apply
       - name: Terraform Plan and Apply
         run: |
           cd infrastructure
@@ -63,22 +63,22 @@ jobs:
         run: |
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 861276099115.dkr.ecr.ap-south-1.amazonaws.com
 
-      # Build FastAPI Docker image and tag it with "latest"
+      # Build Docker image and tag it
       - name: Build Docker image
         run: |
           docker build -t 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest -f app/Dockerfile .
 
-      # Push the image to AWS ECR
+      # Push Docker image to AWS ECR
       - name: Push Docker image to AWS ECR
         run: |
           docker push 861276099115.dkr.ecr.ap-south-1.amazonaws.com/auth_app_repo:latest
 
-      # MongoDB shell connection check (Optional, but can verify if MongoDB is accessible)
+      # MongoDB shell connection check
       - name: Check MongoDB shell connection
         run: |
           docker run --rm mongo:5.0 mongo --host 43.204.143.5 --eval "db.runCommand({ connectionStatus: 1 })"
 
-      # Run Docker Compose locally (You will have to ensure that Docker Compose is installed on the GitHub runner if testing this locally)
+      # Run Docker Compose locally
       - name: Run Docker Compose Locally
         run: |
           docker-compose -f docker-compose.yaml up -d
