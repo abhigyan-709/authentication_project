@@ -64,8 +64,11 @@ resource "aws_iam_user" "ecr_user" {
 
 # Attach the Policy to the IAM User
 resource "aws_iam_user_policy_attachment" "ecr_policy_attachment" {
-  user       = aws_iam_user.ecr_user.name
-  policy_arn = coalesce(data.aws_iam_policy.existing_policy.arn, aws_iam_policy.ecr_policy[0].arn)
+  user = aws_iam_user.ecr_user.name
+
+  policy_arn = length(aws_iam_policy.ecr_policy) > 0 
+    ? aws_iam_policy.ecr_policy[0].arn 
+    : data.aws_iam_policy.existing_policy.arn
 
   lifecycle {
     prevent_destroy = true
@@ -96,8 +99,11 @@ resource "aws_iam_role" "ecr_role" {
 
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "ecr_role_policy_attachment" {
-  role       = aws_iam_role.ecr_role.name
-  policy_arn = coalesce(data.aws_iam_policy.existing_policy.arn, aws_iam_policy.ecr_policy[0].arn)
+  role = aws_iam_role.ecr_role.name
+
+  policy_arn = length(aws_iam_policy.ecr_policy) > 0 
+    ? aws_iam_policy.ecr_policy[0].arn 
+    : data.aws_iam_policy.existing_policy.arn
 
   lifecycle {
     prevent_destroy = true

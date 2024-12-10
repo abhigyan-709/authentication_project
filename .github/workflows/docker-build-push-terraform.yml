@@ -47,7 +47,7 @@ jobs:
         run: |
           cd infrastructure
           terraform import aws_ecr_repository.auth_repo auth_app_repo || echo "Repository already imported"
-          terraform import aws_iam_policy.ecr_policy arn:aws:iam::<AWS_ACCOUNT_ID>:policy/ECRAccessPolicy || echo "Policy already imported"
+          terraform import aws_iam_policy.existing_policy arn:aws:iam::861276099115:policy/ECRAccessPolicy || echo "Policy already imported"
           terraform import aws_iam_user.ecr_user ecr_user || echo "User already imported"
           terraform import aws_iam_role.ecr_role ECRRole || echo "Role already imported"
 
