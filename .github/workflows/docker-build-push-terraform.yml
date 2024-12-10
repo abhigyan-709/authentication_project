@@ -22,6 +22,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
       # Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
